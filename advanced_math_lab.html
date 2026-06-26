@@ -1,0 +1,664 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--sidebar-w:180px;--accent:#4f8ef7;--accent-dim:#1a3a6e;--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--bg4:#252d40;--border:#2a3347;--text:#e8eaf0;--text2:#8892a4;--text3:#4a5568;--success:#3ecf8e;--warn:#f59e0b;--err:#ef4444;--radius:8px}
+body{font-family:var(--font-sans,system-ui,sans-serif);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:600px}
+.app{display:flex;height:620px;border:0.5px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg)}
+.sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:0.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-logo{padding:16px 14px 12px;font-size:13px;font-weight:500;color:var(--accent);letter-spacing:.02em;border-bottom:0.5px solid var(--border)}
+.sidebar-logo span{display:block;font-size:10px;color:var(--text2);font-weight:400;margin-top:2px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:10px 14px;cursor:pointer;border-left:3px solid transparent;color:var(--text2);transition:all .15s;font-size:13px}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--bg3);color:var(--accent);border-left-color:var(--accent)}
+.nav-item i{font-size:16px;width:18px;text-align:center}
+.history-section{margin-top:auto;border-top:0.5px solid var(--border);padding:10px 0}
+.history-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:6px 14px 4px}
+.history-item{padding:6px 14px;cursor:pointer;color:var(--text2);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .15s}
+.history-item:hover{background:var(--bg3);color:var(--text)}
+.history-item .hist-tag{font-size:9px;padding:1px 5px;border-radius:3px;margin-right:4px;font-weight:500}
+.tag-calc{background:#1a3a6e;color:#4f8ef7}.tag-calc2{background:#1a3a1a;color:#3ecf8e}.tag-alg{background:#3a1a3a;color:#a78bfa}.tag-geo{background:#3a2a1a;color:#f59e0b}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tab-bar{display:flex;align-items:center;padding:0 16px;background:var(--bg2);border-bottom:0.5px solid var(--border);gap:4px;min-height:42px}
+.tab{padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;transition:all .15s}
+.tab:hover{background:var(--bg3);color:var(--text)}
+.tab.active{background:var(--accent-dim);color:var(--accent)}
+.content{flex:1;overflow-y:auto;padding:16px}
+.content::-webkit-scrollbar{width:4px}.content::-webkit-scrollbar-track{background:transparent}.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.panel-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.panel-title i{color:var(--accent)}
+.card{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.card-title{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:10px;font-weight:500}
+.row{display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap}
+label{font-size:12px;color:var(--text2);margin-bottom:4px;display:block}
+input,select{background:var(--bg4);border:0.5px solid var(--border);border-radius:6px;color:var(--text);padding:7px 10px;font-size:13px;width:100%;outline:none;font-family:inherit;transition:border .15s}
+input:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--bg4)}
+.inp-group{flex:1;min-width:80px}
+btn,.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--bg4);color:var(--text2);transition:all .15s;font-family:inherit}
+.btn:hover{background:var(--bg3);color:var(--text);border-color:var(--accent)}
+.btn-primary{background:var(--accent-dim);color:var(--accent);border-color:var(--accent)}
+.btn-primary:hover{background:#203d80}
+.result-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:12px 14px;font-family:var(--font-mono,monospace);font-size:14px;color:var(--text);line-height:1.6;word-break:break-all;min-height:44px}
+.result-box.error{border-color:var(--err);color:var(--err)}
+.result-box.success{border-color:var(--success)}
+.steps-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.8;display:none}
+.steps-box.show{display:block}
+.steps-box .step{padding:3px 0;display:flex;gap:8px}.steps-box .step-n{color:var(--accent);font-weight:500;min-width:18px}
+.toggle-steps{font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline;background:none;border:none;padding:0;margin-top:6px;font-family:inherit}
+.sub-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.sub-tab{padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px;color:var(--text2);border:0.5px solid transparent;background:var(--bg3);transition:all .15s}
+.sub-tab:hover{color:var(--text);border-color:var(--border)}
+.sub-tab.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent)}
+.graph-canvas{width:100%;height:120px;border-radius:6px;display:block}
+.badge{font-size:10px;padding:2px 7px;border-radius:3px;font-weight:500}
+.badge-info{background:#1a3a6e;color:#4f8ef7}
+.disc-pos{color:var(--success)}.disc-zer{color:var(--warn)}.disc-neg{color:var(--err)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sep{height:0.5px;background:var(--border);margin:12px 0}
+.calc-display{background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.calc-expr{padding:8px 12px 4px;font-size:11px;color:var(--text2);font-family:monospace;min-height:24px}
+.calc-result{padding:4px 12px 10px;font-size:22px;font-family:monospace;color:var(--text);text-align:right;word-break:break-all}
+.keypad{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.key{padding:9px 4px;text-align:center;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;background:var(--bg4);border:0.5px solid var(--border);color:var(--text2);transition:all .12s;user-select:none}
+.key:hover{background:var(--bg3);color:var(--text);border-color:var(--accent)}
+.key:active{transform:scale(.94)}
+.key-op{background:var(--bg3);color:var(--accent)}
+.key-fn{background:var(--bg3);color:#a78bfa;font-size:11px}
+.key-eq{background:var(--accent-dim);color:var(--accent);border-color:var(--accent)}
+.key-clr{color:var(--err);border-color:#3a2020}
+</style>
+<h2 class="sr-only">Advanced Math Lab — Calculator, Calculus, Algebra, and Geometry modules in a dark-themed browser interface</h2>
+<div class="app">
+<div class="sidebar">
+  <div class="sidebar-logo">∑ Math Lab<span>Advanced • Browser-only</span></div>
+  <div class="nav-item active" onclick="switchModule('calc')" id="nav-calc"><i class="ti ti-calculator" aria-hidden="true"></i>Calculator</div>
+  <div class="nav-item" onclick="switchModule('calc2')" id="nav-calc2"><i class="ti ti-infinity" aria-hidden="true"></i>Calculus</div>
+  <div class="nav-item" onclick="switchModule('alg')" id="nav-alg"><i class="ti ti-variable" aria-hidden="true"></i>Algebra</div>
+  <div class="nav-item" onclick="switchModule('geo')" id="nav-geo"><i class="ti ti-shape" aria-hidden="true"></i>Geometry</div>
+  <div class="history-section">
+    <div class="history-label">Recent</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+<div class="main">
+  <div class="tab-bar" id="tab-bar"></div>
+  <div class="content" id="content-area"></div>
+</div>
+</div>
+
+<script>
+const history = [];
+function addHistory(tag, tagCls, label, action) {
+  history.unshift({tag, tagCls, label, action});
+  if (history.length > 8) history.pop();
+  renderHistory();
+}
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  el.innerHTML = history.map((h,i) => `<div class="history-item" onclick="rerun(${i})" title="${h.label}"><span class="hist-tag ${h.tagCls}">${h.tag}</span>${h.label}</div>`).join('');
+}
+function rerun(i) { history[i].action(); }
+
+let currentModule = 'calc';
+function switchModule(mod) {
+  currentModule = mod;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('nav-' + mod).classList.add('active');
+  renderModule(mod);
+}
+
+function renderModule(mod) {
+  const tabs = {
+    calc: [{id:'calc-sci',label:'Scientific'},{id:'calc-const',label:'Constants'}],
+    calc2: [{id:'calc2-deriv',label:'Derivative'},{id:'calc2-integ',label:'Integral'},{id:'calc2-limit',label:'Limit'}],
+    alg: [{id:'alg-linear',label:'Linear'},{id:'alg-system',label:'System'},{id:'alg-quad',label:'Quadratic'},{id:'alg-poly',label:'Polynomial'}],
+    geo: [{id:'geo-2d',label:'2D shapes'},{id:'geo-3d',label:'3D shapes'}]
+  };
+  const bar = document.getElementById('tab-bar');
+  bar.innerHTML = (tabs[mod]||[]).map(t=>`<div class="tab" id="tab-${t.id}" onclick="switchTab('${t.id}')">${t.label}</div>`).join('');
+  const firstTab = tabs[mod]?.[0]?.id;
+  if (firstTab) switchTab(firstTab, true);
+}
+
+let currentTab = '';
+function switchTab(id, init) {
+  currentTab = id;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const tab = document.getElementById('tab-'+id);
+  if (tab) tab.classList.add('active');
+  renderTab(id);
+}
+
+function renderTab(id) {
+  const area = document.getElementById('content-area');
+  if (id === 'calc-sci') area.innerHTML = sciCalcHTML();
+  else if (id === 'calc-const') area.innerHTML = constHTML();
+  else if (id === 'calc2-deriv') area.innerHTML = derivHTML();
+  else if (id === 'calc2-integ') area.innerHTML = integHTML();
+  else if (id === 'calc2-limit') area.innerHTML = limitHTML();
+  else if (id === 'alg-linear') area.innerHTML = linearHTML();
+  else if (id === 'alg-system') area.innerHTML = systemHTML();
+  else if (id === 'alg-quad') area.innerHTML = quadHTML();
+  else if (id === 'alg-poly') area.innerHTML = polyHTML();
+  else if (id === 'geo-2d') area.innerHTML = geo2dHTML();
+  else if (id === 'geo-3d') area.innerHTML = geo3dHTML();
+  attachHandlers(id);
+}
+
+function sciCalcHTML() {
+  return `<div class="panel-title"><i class="ti ti-calculator" aria-hidden="true"></i>Scientific calculator</div>
+<div class="calc-display"><div class="calc-expr" id="sci-expr"></div><div class="calc-result" id="sci-res">0</div></div>
+<div style="margin-bottom:8px;display:flex;gap:6px;align-items:center">
+  <input id="sci-input" placeholder="Type expression e.g. sin(pi/2)*3^2" style="flex:1"/>
+  <button class="btn btn-primary" onclick="evalSci()"><i class="ti ti-equal" aria-hidden="true"></i>Calc</button>
+</div>
+<div class="keypad" id="keypad">
+  ${[['sin(','cos(','tan(','log(','ln('],
+     ['sqrt(','abs(','fact(','pi','e'],
+     ['7','8','9','(',')'],[
+     '4','5','6','*','/'],['1','2','3','+','-'],
+     ['0','.','Ans','^','%'],
+     ['←','C','','','=']].flat().map((k,i)=>{
+    let cls='key';
+    if(['sin(','cos(','tan(','log(','ln(','sqrt(','abs(','fact('].includes(k)) cls='key key-fn';
+    else if(['+','-','*','/','%','^','(',')'].includes(k)) cls='key key-op';
+    else if(k==='=') cls='key key-eq';
+    else if(k==='C') cls='key key-clr';
+    return k?`<div class="${cls}" onclick="keyPress('${k}')">${k==='←'?'⌫':k}</div>`:'<div></div>';
+  }).join('')}
+</div>`;
+}
+
+function constHTML() {
+  const consts=[
+    {name:'π (pi)',val:Math.PI,sym:'π'},
+    {name:'e (Euler\'s)',val:Math.E,sym:'e'},
+    {name:'φ (golden ratio)',val:1.6180339887,sym:'φ'},
+    {name:'√2',val:Math.SQRT2,sym:'√2'},
+    {name:'ln(2)',val:Math.LN2,sym:'ln2'},
+    {name:'log₁₀(e)',val:Math.LOG10E,sym:'log₁₀e'},
+    {name:'Speed of light (c)',val:'299,792,458 m/s',sym:'c'},
+    {name:'Gravity (g)',val:'9.80665 m/s²',sym:'g'},
+  ];
+  return `<div class="panel-title"><i class="ti ti-atom" aria-hidden="true"></i>Mathematical constants</div>
+  ${consts.map(c=>`<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;margin-bottom:6px"><div><div style="font-weight:500;font-size:13px">${c.name}</div></div><div style="font-family:monospace;font-size:13px;color:var(--accent)">${typeof c.val==='number'?c.val.toPrecision(10):c.val}</div></div>`).join('')}`;
+}
+
+function derivHTML(){
+  return `<div class="panel-title"><i class="ti ti-math-function" aria-hidden="true"></i>Symbolic derivative</div>
+<div class="card"><div class="card-title">Enter function f(x)</div>
+<div class="row"><div class="inp-group"><label>f(x) =</label><input id="d-fx" placeholder="e.g. x^3 + 2*x^2 - 5*x + 1"/></div></div>
+<div class="row"><div class="inp-group"><label>Evaluate at x = (optional)</label><input id="d-pt" placeholder="e.g. 2" type="number"/></div>
+<div style="align-self:flex-end"><button class="btn btn-primary" onclick="calcDeriv()"><i class="ti ti-arrow-right" aria-hidden="true"></i>Differentiate</button></div></div>
+</div>
+<div class="card"><div class="card-title">Result</div>
+<div class="result-box" id="d-result" style="min-height:36px">—</div>
+<button class="toggle-steps" id="d-steps-btn" onclick="toggleEl('d-steps')" style="display:none">Show steps ▾</button>
+<div class="steps-box" id="d-steps"></div></div>`;
+}
+
+function integHTML(){
+  return `<div class="panel-title"><i class="ti ti-math-integral-x" aria-hidden="true"></i>Definite integral (numeric)</div>
+<div class="card"><div class="card-title">∫ₐᵇ f(x) dx</div>
+<div class="row"><div class="inp-group"><label>f(x) =</label><input id="i-fx" placeholder="e.g. x^2 + sin(x)"/></div></div>
+<div class="row"><div class="inp-group"><label>a (lower)</label><input id="i-a" type="number" value="0"/></div>
+<div class="inp-group"><label>b (upper)</label><input id="i-b" type="number" value="1"/></div>
+<div style="align-self:flex-end"><button class="btn btn-primary" onclick="calcInteg()"><i class="ti ti-arrow-right" aria-hidden="true"></i>Integrate</button></div></div>
+</div>
+<div class="card"><div class="card-title">Result</div>
+<div class="result-box" id="i-result">—</div>
+<div class="steps-box show" id="i-steps" style="margin-top:8px"></div></div>`;
+}
+
+function limitHTML(){
+  return `<div class="panel-title"><i class="ti ti-arrows-join" aria-hidden="true"></i>Limit evaluator</div>
+<div class="card"><div class="card-title">lim x→c f(x)</div>
+<div class="row"><div class="inp-group"><label>f(x) =</label><input id="l-fx" placeholder="e.g. (x^2-1)/(x-1)"/></div></div>
+<div class="row"><div class="inp-group"><label>c (approach)</label><input id="l-c" placeholder="e.g. 1" value="0"/></div>
+<div class="inp-group"><label>Direction</label><select id="l-dir"><option value="both">Both sides</option><option value="left">Left (−)</option><option value="right">Right (+)</option></select></div>
+<div style="align-self:flex-end"><button class="btn btn-primary" onclick="calcLimit()">Evaluate</button></div></div>
+</div>
+<div class="card"><div class="card-title">Result</div>
+<div class="result-box" id="l-result">—</div>
+<div class="steps-box show" id="l-steps" style="margin-top:8px"></div></div>`;
+}
+
+function linearHTML(){
+  return `<div class="panel-title"><i class="ti ti-variable" aria-hidden="true"></i>Linear equation solver</div>
+<div class="card"><div class="card-title">ax + b = c</div>
+<div class="row">
+<div class="inp-group"><label>a</label><input id="lin-a" type="number" value="2"/></div>
+<div class="inp-group"><label>b</label><input id="lin-b" type="number" value="3"/></div>
+<div class="inp-group"><label>c</label><input id="lin-c" type="number" value="7"/></div>
+<div style="align-self:flex-end"><button class="btn btn-primary" onclick="solveLinear()">Solve</button></div></div>
+</div>
+<div class="card"><div class="result-box" id="lin-result">—</div>
+<button class="toggle-steps" id="lin-steps-btn" onclick="toggleEl('lin-steps')" style="display:none">Show steps ▾</button>
+<div class="steps-box" id="lin-steps"></div></div>`;
+}
+
+function systemHTML(){
+  return `<div class="panel-title"><i class="ti ti-table" aria-hidden="true"></i>System of two equations</div>
+<div class="card"><div class="card-title">a₁x + b₁y = c₁ &nbsp;|&nbsp; a₂x + b₂y = c₂</div>
+<div class="grid2" style="margin-bottom:8px">
+<div><label>a₁</label><input id="s-a1" type="number" value="2"/></div>
+<div><label>b₁</label><input id="s-b1" type="number" value="3"/></div>
+<div><label>c₁</label><input id="s-c1" type="number" value="12"/></div>
+<div style="grid-column:span 1"></div>
+<div><label>a₂</label><input id="s-a2" type="number" value="1"/></div>
+<div><label>b₂</label><input id="s-b2" type="number" value="-1"/></div>
+<div><label>c₂</label><input id="s-c2" type="number" value="1"/></div>
+</div>
+<button class="btn btn-primary" onclick="solveSystem()">Solve</button>
+</div>
+<div class="card"><div class="result-box" id="sys-result">—</div>
+<div class="steps-box show" id="sys-steps" style="margin-top:8px"></div></div>`;
+}
+
+function quadHTML(){
+  return `<div class="panel-title"><i class="ti ti-chart-line" aria-hidden="true"></i>Quadratic equation solver</div>
+<div class="card"><div class="card-title">ax² + bx + c = 0</div>
+<div class="row">
+<div class="inp-group"><label>a</label><input id="q-a" type="number" value="1"/></div>
+<div class="inp-group"><label>b</label><input id="q-b" type="number" value="-5"/></div>
+<div class="inp-group"><label>c</label><input id="q-c" type="number" value="6"/></div>
+<div style="align-self:flex-end"><button class="btn btn-primary" onclick="solveQuad()">Solve</button></div></div>
+</div>
+<div class="card" id="q-res-card">
+<div class="result-box" id="q-result">—</div>
+<div id="q-disc" style="margin-top:8px;font-size:12px"></div>
+<canvas class="graph-canvas" id="q-graph" style="margin-top:12px;display:none"></canvas>
+</div>`;
+}
+
+function polyHTML(){
+  return `<div class="panel-title"><i class="ti ti-sum" aria-hidden="true"></i>Polynomial simplifier</div>
+<div class="card"><div class="card-title">Enter polynomial in x</div>
+<div class="row"><div class="inp-group"><label>p(x) =</label><input id="poly-in" placeholder="e.g. 3*x^2 + 2*x - x^2 + 4*x - 7"/></div>
+<div style="align-self:flex-end"><button class="btn btn-primary" onclick="simplifyPoly()">Simplify</button></div></div>
+</div>
+<div class="card"><div class="card-title">Result</div>
+<div class="result-box" id="poly-result">—</div>
+<div class="steps-box show" id="poly-steps" style="margin-top:8px"></div></div>`;
+}
+
+function geo2dHTML(){
+  const shapes=['Circle','Triangle','Rectangle','Square','Parallelogram','Trapezoid','Regular hexagon','Ellipse'];
+  return `<div class="panel-title"><i class="ti ti-circle-square" aria-hidden="true"></i>2D geometry</div>
+<div class="card"><div class="card-title">Shape</div>
+<select id="g2-shape" onchange="renderGeo2d()">${shapes.map(s=>`<option>${s}</option>`).join('')}</select>
+<div id="g2-inputs" style="margin-top:10px"></div>
+<button class="btn btn-primary" style="margin-top:8px" onclick="calcGeo2d()">Calculate</button>
+</div>
+<div class="card"><div class="result-box" id="g2-result">—</div></div>`;
+}
+
+function geo3dHTML(){
+  const shapes=['Sphere','Cylinder','Cone','Cube','Rectangular prism','Triangular prism'];
+  return `<div class="panel-title"><i class="ti ti-cube" aria-hidden="true"></i>3D geometry</div>
+<div class="card"><div class="card-title">Shape</div>
+<select id="g3-shape" onchange="renderGeo3d()">${shapes.map(s=>`<option>${s}</option>`).join('')}</select>
+<div id="g3-inputs" style="margin-top:10px"></div>
+<button class="btn btn-primary" style="margin-top:8px" onclick="calcGeo3d()">Calculate</button>
+</div>
+<div class="card"><div class="result-box" id="g3-result">—</div></div>`;
+}
+
+function attachHandlers(id) {
+  if (id === 'calc-sci') initSciCalc();
+  if (id === 'geo-2d') renderGeo2d();
+  if (id === 'geo-3d') renderGeo3d();
+}
+
+let sciExpr = '', sciLastAns = 0;
+function initSciCalc() {
+  const inp = document.getElementById('sci-input');
+  if (inp) inp.addEventListener('keydown', e => { if (e.key==='Enter') evalSci(); });
+}
+function keyPress(k) {
+  if (k==='=') { evalSci(); return; }
+  if (k==='C') { sciExpr=''; updateSciDisplay(); return; }
+  if (k==='←') { sciExpr=sciExpr.slice(0,-1); updateSciDisplay(); return; }
+  if (k==='Ans') { sciExpr+=sciLastAns; updateSciDisplay(); return; }
+  sciExpr+=k;
+  updateSciDisplay();
+}
+function updateSciDisplay() {
+  const ei=document.getElementById('sci-expr');
+  const inp=document.getElementById('sci-input');
+  if(ei) ei.textContent=sciExpr||'';
+  if(inp) inp.value=sciExpr;
+}
+function evalSci() {
+  const inp=document.getElementById('sci-input');
+  let expr = (inp?.value||sciExpr).trim();
+  if(!expr){setRes('sci-res','0');return;}
+  sciExpr=expr;
+  try {
+    const result = mathEval(expr);
+    const r=typeof result==='number'?fmtNum(result):result;
+    setRes('sci-res',r);
+    sciLastAns=result;
+    document.getElementById('sci-expr').textContent=expr+' =';
+    addHistory('calc','tag-calc',expr.slice(0,22)+' = '+r,()=>{switchModule('calc');setTimeout(()=>{document.getElementById('sci-input').value=expr;evalSci();},100);});
+  } catch(e) {
+    setRes('sci-res','Error: '+e.message);
+    document.getElementById('sci-res').classList.add('error');
+    setTimeout(()=>document.getElementById('sci-res')?.classList.remove('error'),2000);
+  }
+}
+function setRes(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+
+function mathEval(expr) {
+  let e = expr.trim();
+  e = e.replace(/fact\(([^)]+)\)/g, (_,a) => factorial(mathEval(a)));
+  e = e.replace(/pi/gi,'('+Math.PI+')').replace(/\be\b/g,'('+Math.E+')');
+  e = e.replace(/sqrt\(/g,'Math.sqrt(').replace(/abs\(/g,'Math.abs(');
+  e = e.replace(/\bsin\(/g,'Math.sin(').replace(/\bcos\(/g,'Math.cos(');
+  e = e.replace(/\btan\(/g,'Math.tan(').replace(/\bln\(/g,'Math.log(');
+  e = e.replace(/\blog\(/g,'Math.log10(');
+  e = e.replace(/(\d+)!/g, (_,n)=>factorial(Number(n)));
+  e = e.replace(/\^/g,'**');
+  const result = Function('"use strict";return ('+e+')')();
+  if (typeof result !== 'number' || isNaN(result)) throw new Error('Invalid expression');
+  return result;
+}
+function factorial(n) {
+  n=Math.round(n);if(n<0)throw new Error('Negative factorial');if(n>20)throw new Error('Too large');
+  return n<=1?1:n*factorial(n-1);
+}
+function fmtNum(n) {
+  if (!isFinite(n)) return n>0?'∞':'-∞';
+  if (Math.abs(n)<1e-10&&n!==0) return n.toExponential(6);
+  if (Math.abs(n)>1e12) return n.toExponential(6);
+  const r=parseFloat(n.toPrecision(10));
+  return r.toString();
+}
+
+function calcDeriv() {
+  const fx=document.getElementById('d-fx').value.trim();
+  const pt=document.getElementById('d-pt').value.trim();
+  if(!fx){showErr('d-result','Enter f(x)');return;}
+  try{
+    const sym=symbolicDeriv(fx);
+    let out=`f'(x) = ${sym.result}`;
+    let steps=sym.steps;
+    if(pt!==''){
+      const xv=parseFloat(pt);
+      const nv=numericDeriv(fx,xv);
+      out+=`\n\nf'(${pt}) ≈ ${fmtNum(nv)}`;
+      steps.push(`Evaluate at x = ${pt}: f'(${pt}) ≈ ${fmtNum(nv)}`);
+    }
+    const el=document.getElementById('d-result');el.textContent=out;el.className='result-box success';
+    showSteps('d-steps',steps);document.getElementById('d-steps-btn').style.display='block';
+    addHistory('∂','tag-calc2','d/dx ['+fx.slice(0,18)+']',()=>{switchModule('calc2');setTimeout(()=>{document.getElementById('d-fx').value=fx;calcDeriv();},100);});
+  }catch(e){showErr('d-result',e.message);}
+}
+
+function symbolicDeriv(fx) {
+  const steps=[];let result;
+  const rules=[
+    [/^x\^(\d+\.?\d*)$/,(m)=>{const n=parseFloat(m[1]);steps.push(`Power rule: d/dx[x^${m[1]}] = ${n}·x^${n-1}`);return n===2?`${n}x`:(n-1===0?`${n}`:`${n}x^${n-1}`);}],
+    [/^(\d+\.?\d*)\*x\^(\d+\.?\d*)$/,(m)=>{const c=parseFloat(m[1]),n=parseFloat(m[2]);const nc=c*n,np=n-1;steps.push(`Power rule with constant: d/dx[${c}x^${n}] = ${nc}x^${np}`);return np===0?`${nc}`:(nc===1?`x^${np}`:`${nc}x^${np}`);}],
+    [/^(\d+\.?\d*)\*x$/,(m)=>{steps.push(`Constant multiple rule: d/dx[${m[1]}x] = ${m[1]}`);return m[1];}],
+    [/^x$/,()=>{steps.push('d/dx[x] = 1');return '1';}],
+    [/^(\d+\.?\d*)$/,()=>{steps.push('d/dx[constant] = 0');return '0';}],
+    [/^sin\(x\)$/,()=>{steps.push('d/dx[sin(x)] = cos(x)');return 'cos(x)';}],
+    [/^cos\(x\)$/,()=>{steps.push('d/dx[cos(x)] = -sin(x)');return '-sin(x)';}],
+    [/^tan\(x\)$/,()=>{steps.push('d/dx[tan(x)] = sec²(x)');return 'sec²(x)';}],
+    [/^ln\(x\)$/,()=>{steps.push('d/dx[ln(x)] = 1/x');return '1/x';}],
+    [/^log\(x\)$/,()=>{steps.push('d/dx[log₁₀(x)] = 1/(x·ln10)');return '1/(x·ln10)';}],
+    [/^e\^x$/,()=>{steps.push('d/dx[eˣ] = eˣ');return 'eˣ';}],
+    [/^sqrt\(x\)$/,()=>{steps.push('d/dx[√x] = 1/(2√x)');return '1/(2√x)';}],
+  ];
+  const clean=fx.replace(/\s/g,'');
+  for(const[pat,fn] of rules){
+    const m=clean.match(pat);
+    if(m){result=fn(m);break;}
+  }
+  if(!result){
+    steps.push('Using numerical differentiation (complex expression)');
+    result='(computed numerically — see evaluation below)';
+  }
+  return{result,steps};
+}
+
+function numericDeriv(fx,x,h=1e-7){
+  const f=v=>{
+    try{return mathEval(fx.replace(/\bx\b/g,`(${v})`));}catch{return NaN;}
+  };
+  return (f(x+h)-f(x-h))/(2*h);
+}
+
+function calcInteg(){
+  const fx=document.getElementById('i-fx').value.trim();
+  const a=parseFloat(document.getElementById('i-a').value);
+  const b=parseFloat(document.getElementById('i-b').value);
+  if(!fx){showErr('i-result','Enter f(x)');return;}
+  if(isNaN(a)||isNaN(b)){showErr('i-result','Enter valid bounds');return;}
+  try{
+    const n=10000,h=(b-a)/n;
+    let sum=0;
+    const f=v=>mathEval(fx.replace(/\bx\b/g,`(${v})`));
+    sum=f(a)+f(b);
+    for(let i=1;i<n;i++) sum+=(i%2===0?2:4)*f(a+i*h);
+    const result=sum*h/3;
+    const el=document.getElementById('i-result');
+    el.textContent=`∫[${a},${b}] (${fx}) dx ≈ ${fmtNum(result)}`;
+    el.className='result-box success';
+    const steps=document.getElementById('i-steps');
+    steps.innerHTML=`<div class="step"><span class="step-n">→</span>Method: Simpson's rule (n=10,000 intervals)</div><div class="step"><span class="step-n">→</span>Interval: [${a}, ${b}], step h = ${fmtNum(h)}</div><div class="step"><span class="step-n">→</span>Result: ${fmtNum(result)}</div>`;
+    addHistory('∫','tag-calc2',`∫(${fx.slice(0,12)}) [${a},${b}]`,()=>{switchModule('calc2');setTimeout(()=>{document.getElementById('i-fx').value=fx;document.getElementById('i-a').value=a;document.getElementById('i-b').value=b;calcInteg();},100);});
+  }catch(e){showErr('i-result',e.message);}
+}
+
+function calcLimit(){
+  const fx=document.getElementById('l-fx').value.trim();
+  const c=parseFloat(document.getElementById('l-c').value);
+  const dir=document.getElementById('l-dir').value;
+  if(!fx){showErr('l-result','Enter f(x)');return;}
+  if(isNaN(c)){showErr('l-result','Enter approach value');return;}
+  const eps=1e-8,small=1e-6;
+  const f=v=>{try{return mathEval(fx.replace(/\bx\b/g,`(${v})`));}catch{return NaN;}};
+  const left=f(c-small),right=f(c+small),direct=f(c);
+  let result,note='';
+  const el=document.getElementById('l-result');
+  if(!isNaN(direct)&&isFinite(direct)){result=direct;note='Direct substitution succeeded.';}
+  else if(dir==='right'){result=right;}
+  else if(dir==='left'){result=left;}
+  else{
+    if(Math.abs(left-right)<eps*100){result=(left+right)/2;}
+    else{result='Limit does not exist (left ≠ right)';note=`L⁻ ≈ ${fmtNum(left)}, L⁺ ≈ ${fmtNum(right)}`;}
+  }
+  const resStr=typeof result==='number'?fmtNum(result):result;
+  el.textContent=`lim x→${c} (${fx}) = ${resStr}`;
+  el.className='result-box '+(typeof result==='number'?'success':'error');
+  const steps=document.getElementById('l-steps');
+  steps.innerHTML=`<div class="step"><span class="step-n">→</span>${direct!==undefined&&!isNaN(direct)?'Direct substitution: f('+c+') = '+fmtNum(direct):'Direct substitution undefined (hole/singularity)'}</div>${note?`<div class="step"><span class="step-n">→</span>${note}</div>`:''}<div class="step"><span class="step-n">→</span>Numeric approach from left: ${fmtNum(left)}</div><div class="step"><span class="step-n">→</span>Numeric approach from right: ${fmtNum(right)}</div>`;
+  addHistory('lim','tag-calc2',`lim→${c}(${fx.slice(0,12)})`,()=>{switchModule('calc2');});
+}
+
+function solveLinear(){
+  const a=parseFloat(document.getElementById('lin-a').value);
+  const b=parseFloat(document.getElementById('lin-b').value);
+  const c=parseFloat(document.getElementById('lin-c').value);
+  if([a,b,c].some(isNaN)){showErr('lin-result','Enter valid numbers');return;}
+  const el=document.getElementById('lin-result');
+  const stepsEl=document.getElementById('lin-steps');
+  const btn=document.getElementById('lin-steps-btn');
+  if(a===0){
+    if(b===c){el.textContent='Infinite solutions (identity)';el.className='result-box';}
+    else{el.textContent='No solution (contradiction)';el.className='result-box error';}
+    stepsEl.innerHTML='';btn.style.display='none';return;
+  }
+  const x=(c-b)/a;
+  el.textContent=`x = ${fmtNum(x)}`;el.className='result-box success';
+  const steps=[`Start: ${a}x + ${b} = ${c}`,`Subtract ${b}: ${a}x = ${c-b}`,`Divide by ${a}: x = ${fmtNum(x)}`];
+  showSteps('lin-steps',steps);btn.style.display='block';
+  addHistory('ax','tag-alg',`${a}x+${b}=${c} → x=${fmtNum(x)}`,()=>{switchModule('alg');});
+}
+
+function solveSystem(){
+  const a1=parseFloat(document.getElementById('s-a1').value),b1=parseFloat(document.getElementById('s-b1').value),c1=parseFloat(document.getElementById('s-c1').value);
+  const a2=parseFloat(document.getElementById('s-a2').value),b2=parseFloat(document.getElementById('s-b2').value),c2=parseFloat(document.getElementById('s-c2').value);
+  const D=a1*b2-a2*b1;
+  const el=document.getElementById('sys-result');
+  const st=document.getElementById('sys-steps');
+  if(D===0){
+    el.textContent='No unique solution (det = 0)';el.className='result-box error';
+    st.innerHTML='<div class="step"><span class="step-n">→</span>Determinant = 0 → parallel or coincident lines</div>';return;
+  }
+  const x=(c1*b2-c2*b1)/D,y=(a1*c2-a2*c1)/D;
+  el.textContent=`x = ${fmtNum(x)},  y = ${fmtNum(y)}`;el.className='result-box success';
+  st.innerHTML=`<div class="step"><span class="step-n">1</span>Cramer's rule: D = ${fmtNum(D)}</div><div class="step"><span class="step-n">2</span>Dx = ${fmtNum(c1*b2-c2*b1)} → x = ${fmtNum(x)}</div><div class="step"><span class="step-n">3</span>Dy = ${fmtNum(a1*c2-a2*c1)} → y = ${fmtNum(y)}</div>`;
+  addHistory('sys','tag-alg',`x=${fmtNum(x)}, y=${fmtNum(y)}`,()=>{switchModule('alg');});
+}
+
+function solveQuad(){
+  const a=parseFloat(document.getElementById('q-a').value);
+  const b=parseFloat(document.getElementById('q-b').value);
+  const c=parseFloat(document.getElementById('q-c').value);
+  if([a,b,c].some(isNaN)||a===0){showErr('q-result','Enter valid a≠0, b, c');return;}
+  const D=b*b-4*a*c;
+  const el=document.getElementById('q-result');
+  const disc=document.getElementById('q-disc');
+  let roots;
+  if(D>0){
+    const x1=(-b+Math.sqrt(D))/(2*a),x2=(-b-Math.sqrt(D))/(2*a);
+    el.textContent=`x₁ = ${fmtNum(x1)},  x₂ = ${fmtNum(x2)}`;el.className='result-box success';
+    disc.innerHTML=`<span class="disc-pos">Δ = ${fmtNum(D)} &gt; 0 — two distinct real roots</span>`;
+    roots=[x1,x2];
+  } else if(D===0){
+    const x=-b/(2*a);
+    el.textContent=`x = ${fmtNum(x)} (double root)`;el.className='result-box success';
+    disc.innerHTML=`<span class="disc-zer">Δ = 0 — one repeated real root</span>`;
+    roots=[x];
+  } else {
+    const re=-b/(2*a),im=Math.sqrt(-D)/(2*a);
+    el.textContent=`x = ${fmtNum(re)} ± ${fmtNum(im)}i`;el.className='result-box';
+    disc.innerHTML=`<span class="disc-neg">Δ = ${fmtNum(D)} &lt; 0 — two complex conjugate roots</span>`;
+    roots=[];
+  }
+  drawParabola(a,b,c,roots);
+  addHistory('x²','tag-alg',`${a}x²+${b}x+${c}`,()=>{switchModule('alg');setTimeout(()=>{document.getElementById('q-a').value=a;document.getElementById('q-b').value=b;document.getElementById('q-c').value=c;solveQuad();},100);});
+}
+
+function drawParabola(a,b,c,roots){
+  const canvas=document.getElementById('q-graph');if(!canvas)return;
+  canvas.style.display='block';
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||400;canvas.height=120;
+  const W=canvas.width,H=canvas.height;
+  const vx=-b/(2*a),vy=a*vx*vx+b*vx+c;
+  const xr=Math.max(3,Math.abs(vx)+3);
+  const xMin=vx-xr,xMax=vx+xr;
+  const pts=200;
+  const ys=[];
+  for(let i=0;i<=pts;i++){const x=xMin+i*(xMax-xMin)/pts;ys.push(a*x*x+b*x+c);}
+  const yMin=Math.min(...ys),yMax=Math.max(...ys);
+  const yRange=yMax-yMin||1;
+  const toS=(x,y)=>[(x-xMin)/(xMax-xMin)*W,(1-(y-yMin)/yRange)*H*0.85+H*0.075];
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='#2a3347';ctx.lineWidth=0.5;
+  const[ox]=toS(0,yMin);
+  ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,H);ctx.stroke();
+  const[,oy]=toS(xMin,0);
+  ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(W,oy);ctx.stroke();
+  ctx.strokeStyle='#4f8ef7';ctx.lineWidth=2;ctx.beginPath();
+  for(let i=0;i<=pts;i++){const x=xMin+i*(xMax-xMin)/pts,y=a*x*x+b*x+c;const[sx,sy]=toS(x,y);i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy);}
+  ctx.stroke();
+  ctx.fillStyle='#3ecf8e';
+  roots.forEach(r=>{const[rx,ry]=toS(r,0);ctx.beginPath();ctx.arc(rx,ry,4,0,Math.PI*2);ctx.fill();});
+}
+
+function simplifyPoly(){
+  const p=document.getElementById('poly-in').value.trim();
+  if(!p){showErr('poly-result','Enter polynomial');return;}
+  try{
+    const coeffs={};
+    const terms=p.replace(/\s/g,'').replace(/-/g,'+-').split('+').filter(Boolean);
+    for(const t of terms){
+      const m=t.match(/^([+-]?\d*\.?\d*)\*?x\^?(\d+)?$/)||t.match(/^([+-]?\d+\.?\d*)$/);
+      if(!m){throw new Error('Cannot parse: '+t);}
+      if(t.match(/x\^(\d+)/)){const n=parseInt(t.match(/x\^(\d+)/)[1]);const c=parseFloat(t.replace(/x\^.*$/,'').replace('*',''))||1;coeffs[n]=(coeffs[n]||0)+c;}
+      else if(t.includes('x')){const c=parseFloat(t.replace('x',''))||1;coeffs[1]=(coeffs[1]||0)+c;}
+      else{coeffs[0]=(coeffs[0]||0)+parseFloat(t);}
+    }
+    const keys=Object.keys(coeffs).map(Number).sort((a,b)=>b-a);
+    const result=keys.filter(k=>coeffs[k]!==0).map(k=>{const c=coeffs[k];const cs=c===1&&k>0?'':(c===-1&&k>0?'-':c.toString()+(k>0?'·':''));return cs+(k===0?'':(k===1?'x':'x^'+k));}).join(' + ').replace(/\+ -/g,'− ')||'0';
+    const el=document.getElementById('poly-result');el.textContent=result;el.className='result-box success';
+    const steps=document.getElementById('poly-steps');
+    steps.innerHTML=keys.filter(k=>coeffs[k]!==0).map(k=>`<div class="step"><span class="step-n">→</span>x^${k} coefficient: ${fmtNum(coeffs[k])}</div>`).join('');
+    addHistory('p(x)','tag-alg','Simplify: '+p.slice(0,18),()=>{switchModule('alg');});
+  }catch(e){showErr('poly-result',e.message);}
+}
+
+const geo2dInputs={
+  'Circle':['r|Radius'],
+  'Triangle':['a|Side a','b|Side b','c|Side c'],
+  'Rectangle':['w|Width','h|Height'],
+  'Square':['s|Side'],
+  'Parallelogram':['b|Base','h|Height'],
+  'Trapezoid':['a|Side a','b|Side b','h|Height'],
+  'Regular hexagon':['s|Side'],
+  'Ellipse':['a|Semi-major (a)','b|Semi-minor (b)']
+};
+function renderGeo2d(){
+  const shape=document.getElementById('g2-shape')?.value;
+  const fields=geo2dInputs[shape]||[];
+  document.getElementById('g2-inputs').innerHTML=`<div class="grid2">${fields.map(f=>{const[id,label]=f.split('|');return`<div><label>${label}</label><input id="g2-${id}" type="number" value="5"/></div>`;}).join('')}</div>`;
+}
+function calcGeo2d(){
+  const shape=document.getElementById('g2-shape').value;
+  const g=id=>parseFloat(document.getElementById('g2-'+id)?.value)||0;
+  let area,perim,extra='';const PI=Math.PI;
+  if(shape==='Circle'){const r=g('r');area=PI*r*r;perim=2*PI*r;}
+  else if(shape==='Triangle'){const a=g('a'),b=g('b'),c=g('c');const s=(a+b+c)/2;area=Math.sqrt(s*(s-a)*(s-b)*(s-c));perim=a+b+c;extra=`\nSemi-perimeter s = ${fmtNum(s)}`;}
+  else if(shape==='Rectangle'){const w=g('w'),h=g('h');area=w*h;perim=2*(w+h);}
+  else if(shape==='Square'){const s=g('s');area=s*s;perim=4*s;}
+  else if(shape==='Parallelogram'){const b=g('b'),h=g('h');area=b*h;perim='(need all sides)';}
+  else if(shape==='Trapezoid'){const a=g('a'),b=g('b'),h=g('h');area=(a+b)*h/2;perim=a+b+'+'+'(legs)';}
+  else if(shape==='Regular hexagon'){const s=g('s');area=3*Math.sqrt(3)/2*s*s;perim=6*s;}
+  else if(shape==='Ellipse'){const a=g('a'),b=g('b');area=PI*a*b;perim=PI*(3*(a+b)-Math.sqrt((3*a+b)*(a+3*b)));}
+  const el=document.getElementById('g2-result');
+  el.textContent=`Area = ${typeof area==='number'?fmtNum(area):area}\nPerimeter = ${typeof perim==='number'?fmtNum(perim):perim}${extra}`;
+  el.className='result-box success';
+  addHistory('2D','tag-geo',shape,()=>{switchModule('geo');});
+}
+
+const geo3dInputs={
+  'Sphere':['r|Radius'],
+  'Cylinder':['r|Radius','h|Height'],
+  'Cone':['r|Radius','h|Height'],
+  'Cube':['s|Side'],
+  'Rectangular prism':['l|Length','w|Width','h|Height'],
+  'Triangular prism':['b|Base','ht|Base height','l|Length']
+};
+function renderGeo3d(){
+  const shape=document.getElementById('g3-shape')?.value;
+  const fields=geo3dInputs[shape]||[];
+  document.getElementById('g3-inputs').innerHTML=`<div class="grid2">${fields.map(f=>{const[id,label]=f.split('|');return`<div><label>${label}</label><input id="g3-${id}" type="number" value="5"/></div>`;}).join('')}</div>`;
+}
+function calcGeo3d(){
+  const shape=document.getElementById('g3-shape').value;
+  const g=id=>parseFloat(document.getElementById('g3-'+id)?.value)||0;
+  let vol,sa;const PI=Math.PI;
+  if(shape==='Sphere'){const r=g('r');vol=4/3*PI*r**3;sa=4*PI*r**2;}
+  else if(shape==='Cylinder'){const r=g('r'),h=g('h');vol=PI*r**2*h;sa=2*PI*r*(r+h);}
+  else if(shape==='Cone'){const r=g('r'),h=g('h');const sl=Math.sqrt(r**2+h**2);vol=PI*r**2*h/3;sa=PI*r*(r+sl);}
+  else if(shape==='Cube'){const s=g('s');vol=s**3;sa=6*s**2;}
+  else if(shape==='Rectangular prism'){const l=g('l'),w=g('w'),h=g('h');vol=l*w*h;sa=2*(l*w+l*h+w*h);}
+  else if(shape==='Triangular prism'){const b=g('b'),ht=g('ht'),l=g('l');vol=0.5*b*ht*l;sa=b*ht+l*(b+2*Math.sqrt((b/2)**2+ht**2));}
+  const el=document.getElementById('g3-result');
+  el.textContent=`Volume = ${fmtNum(vol)}\nSurface area = ${fmtNum(sa)}`;
+  el.className='result-box success';
+  addHistory('3D','tag-geo',shape,()=>{switchModule('geo');});
+}
+
+function showErr(id,msg){const el=document.getElementById(id);if(el){el.textContent='Error: '+msg;el.className='result-box error';}}
+function showSteps(id,steps){const el=document.getElementById(id);if(el)el.innerHTML=steps.map((s,i)=>`<div class="step"><span class="step-n">${i+1}</span>${s}</div>`).join('');}
+function toggleEl(id){const el=document.getElementById(id);if(el){el.classList.toggle('show');const btn=document.getElementById(id+'-btn');if(btn)btn.textContent=el.classList.contains('show')?'Hide steps ▴':'Show steps ▾';}}
+
+switchModule('calc');
+</script>
