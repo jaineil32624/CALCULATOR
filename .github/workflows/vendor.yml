@@ -1,0 +1,35 @@
+name: Vendor offline assets
+
+# Downloads the Tabler icon webfont used by the app into vendor/
+# so the site, the installable PWA and the Android APK all work offline.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/vendor.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare vendor dir
+        run: mkdir -p vendor/tabler/fonts
+      - name: Download Tabler Icons webfont
+        run: |
+          BASE="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist"
+          curl -fsSL "$BASE/tabler-icons.min.css" -o vendor/tabler/tabler-icons.min.css
+          curl -fsSL "$BASE/fonts/tabler-icons.woff2" -o vendor/tabler/fonts/tabler-icons.woff2
+          curl -fsSL "$BASE/fonts/tabler-icons.woff" -o vendor/tabler/fonts/tabler-icons.woff
+          curl -fsSL "$BASE/fonts/tabler-icons.ttf" -o vendor/tabler/fonts/tabler-icons.ttf
+          ls -la vendor/tabler vendor/tabler/fonts
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add vendor
+          git diff --cached --quiet || git commit -m "Vendor Tabler icon font for offline use"
+          git push
