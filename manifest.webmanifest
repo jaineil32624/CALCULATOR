@@ -1,0 +1,23 @@
+{
+  "name": "Math Lab — Advanced Calculator",
+  "short_name": "Math Lab",
+  "description": "Scientific calculator, function grapher, symbolic derivatives, integrals, limits, algebra solvers, geometry and unit/base converters — works offline.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f1117",
+  "theme_color": "#0f1117",
+  "categories": ["education", "utilities", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Calculator", "url": "./index.html#tab=calc-sci" },
+    { "name": "Graph y = f(x)", "url": "./index.html#tab=graph-plot" },
+    { "name": "Unit converter", "url": "./index.html#tab=conv-unit" }
+  ]
+}
